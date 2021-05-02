@@ -19,6 +19,17 @@ from collections import OrderedDict
 import itertools
 
 
+
+###############################################################################
+# Log Parser app
+# Arguments description
+#  * logListDic - holds the entire log lines 
+#  * finalResponse - Final response dictionary
+#  * requestDistribution - Contains the stats for various request distributions
+################################################################################
+
+# Initializing the logging framework
+
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
@@ -26,7 +37,7 @@ logging.basicConfig(
 
 
 
-
+# Initializing Flask and the main route
 
 from flask import Flask
 app = Flask(__name__)
@@ -54,6 +65,7 @@ def parseLogFile(logListDic,finalResponse,requestDistribution):
         lines = [line.rstrip() for line in f]
         #logging.debug("Lines list            : %r " % (lines))
     for line in lines:
+        # Making use of the apache_log_parser library to parse the log files based on the format.
         line_parser = apache_log_parser.make_parser("%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"")
         #logging.debug("The line parser output is",line_parser(line))
 
@@ -68,7 +80,7 @@ def parseLogFile(logListDic,finalResponse,requestDistribution):
         if eachReq["request_method"] == "GET":
             totalRef.add(eachReq["request_header_referer"])
 
-
+    # Construct the request Map
     for eachReq in logListDic:
         if eachReq["request_method"] == "GET":
             requestDistribution["GET"] += 1
